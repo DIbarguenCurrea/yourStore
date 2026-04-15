@@ -1,5 +1,6 @@
 const bcrypt = require("bcrypt");
 const userModel = require("../db/models/users");
+const jwt = require("jsonwebtoken");
 
 const registerUser = async (req, res) => {
   try {
@@ -11,13 +12,13 @@ const registerUser = async (req, res) => {
         .json({ message: "Todos los campos son requeridos" });
     }
 
-    const existUser = await userByEmail(email);
+    const existUser = await userModel.userByEmail(email);
 
     if (existUser) {
       return res.status(400).json({ message: "El usuario ya existe" });
     }
 
-    const password_hash = await bcrypt.hash(passsword, 10);
+    const password_hash = await bcrypt.hash(password, 10);
 
     await userModel.createUser({
       name,
@@ -75,10 +76,32 @@ const loginUser = async (req, res) => {
       return res.status(401).json({ message: "Credenciales incorrectas" });
     }
 
-    return res.status(200).json({ message: "Inicio de sesión exitoso" });
+    const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, {
+      expiresIn: "7d",
+    });
+
+    return res.status(200).json({ message: "Inicio de sesión exitoso", token });
   } catch (error) {
     console.error("Error al iniciar sesión:", error);
   }
 };
 
-module.exports = { registerUser, updateUser, deleteUser, loginUser };
+const getProfile = async (req, res) => {
+  try {
+    return res.status(200).json({
+      message: "Perfil obtenido correctamente",
+      user: req.user,
+    });
+  } catch (error) {
+    console.error("Error al obtener el perfil:", error);
+    return res.status(500).json({ message: "Error interno del servidor" });
+  }
+};
+
+module.exports = {
+  registerUser,
+  updateUser,
+  deleteUser,
+  loginUser,
+  getProfile,
+};

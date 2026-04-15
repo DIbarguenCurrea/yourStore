@@ -4,6 +4,7 @@ const cors = require("cors");
 
 const productsRouter = require("./routes/products");
 const usersRouter = require("./routes/users");
+const authRouter = require("./routes/auth");
 
 // Paso 2: Aqui lo instancio.
 
@@ -19,5 +20,6 @@ app.get("/", (req, res) => {
 // Rutas de mis endpoints
 app.use("/products", productsRouter);
 app.use("/users", usersRouter);
+app.use("/auth", authRouter);
 
 module.exports = app;
