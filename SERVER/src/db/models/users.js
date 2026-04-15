@@ -1,4 +1,4 @@
-const db = require("../config/dbConfig");
+const db = require("../../config/dbConfig");
 
 const createUser = async (userData) => {
   const { name, email, password_hash } = userData;
@@ -35,4 +35,4 @@ const deleteUser = async (id) => {
   return result;
 };
 
-module.exports = { createUser, userbyId, userByEmail, updateUser };
+module.exports = { createUser, userbyId, userByEmail, updateUser, deleteUser };

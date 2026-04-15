@@ -3,6 +3,7 @@ const express = require("express");
 const cors = require("cors");
 
 const productsRouter = require("./routes/products");
+const usersRouter = require("./routes/users");
 
 // Paso 2: Aqui lo instancio.
 
@@ -17,5 +18,6 @@ app.get("/", (req, res) => {
 
 // Rutas de mis endpoints
 app.use("/products", productsRouter);
+app.use("/users", usersRouter);
 
 module.exports = app;
