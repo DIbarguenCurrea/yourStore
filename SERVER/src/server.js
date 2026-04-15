@@ -1,6 +1,7 @@
 // Paso 1: Aqui llamo a toda la libreria de Express y las rutas de mis endpoints
 const express = require("express");
 const cors = require("cors");
+
 const productsRouter = require("./routes/products");
 
 // Paso 2: Aqui lo instancio.

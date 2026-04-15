@@ -9,7 +9,7 @@ const startServer = async () => {
     console.log("✅ Conexión a MySQL exitosa'");
     connection.release();
 
-    await app.listen(PORT, () => {
+    app.listen(PORT, () => {
       console.log(`Server listening on http://localhost:${PORT}`);
     });
   } catch (error) {
