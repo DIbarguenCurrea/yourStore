@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Button } from "antd";
+import { Button,Badge} from "antd";
 import { useNavigate } from "react-router-dom";
 import ProfileModal from "../profile/ProfileModal";
 import { getProfile } from "../../services/authService";
@@ -8,11 +8,44 @@ import {
   ShoppingCartOutlined,
   UserOutlined,
 } from "@ant-design/icons";
+import { getCartCount } from "../../services/cartService";
 
 export default function navbar() {
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
   const [user, setUser] = useState(null);
+  const [cartCount, setCartCount] = useState(0); // Estado para la cantidad de productos en el carrito
+
+  // Contador para el carrito en el navbar
+  useEffect(() => {
+    // Funcion para actualizar la cantidad
+    const updateCartCount = () => {
+      setCartCount(getCartCount());
+    };
+    // Actualiza
+    updateCartCount();
+    // Agrega el evento al window 
+    window.addEventListener("cartUpdated", updateCartCount);
+
+    return () => {
+      // Elimina el evento
+      window.removeEventListener("cartUpdated", updateCartCount);
+    };
+  }, []);
+
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const response = await getProfile();
+        setUser(response.user);
+      } catch (error) {
+        console.error("Error al obtener el perfil:", error);
+      }
+    };
+    fetchUser();
+  }, []);
+
 
   //Logica de cerrar sesión, delete del token en localstorage y lo redirijo al login/register.
   const handleLogout = () => {
@@ -36,17 +69,6 @@ export default function navbar() {
       },
     });
   };
-  useEffect(() => {
-    const fetchUser = async () => {
-      try {
-        const response = await getProfile();
-        setUser(response.user);
-      } catch (error) {
-        console.error("Error al obtener el perfil:", error);
-      }
-    };
-    fetchUser();
-  }, []);
 
   return (
     <div
@@ -56,7 +78,7 @@ export default function navbar() {
         alignItems: "center",
       }}
     >
-      <div>
+      <div onClick={() => navigate("/home")}>
         <h1 style={{ color: "#fff" }}>Your Store</h1>
       </div>
       <div>
@@ -76,6 +98,7 @@ export default function navbar() {
         {/* Modal de perfil */}
         <ProfileModal open={open} onClose={() => setOpen(false)} />
 
+         <Badge count={cartCount} showZero style={{ marginRight: 14, backgroundColor: "#fff", color: "#000" }}>
         <Button
           type="text"
           style={{
@@ -84,10 +107,13 @@ export default function navbar() {
             fontSize: 16,
             fontWeight: 600,
           }}
+          onClick={() => navigate("/cart")}
         >
           <ShoppingCartOutlined />
           Cart
         </Button>
+        </Badge>
+
         <Button
           type="text"
           style={{

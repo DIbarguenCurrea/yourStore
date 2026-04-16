@@ -1,7 +1,8 @@
-import { Button, Card, Image, Row, Typography } from "antd";
+import { Button, Card, Image, Row, Col, Typography, message } from "antd";
 import React, { useEffect, useState } from "react";
 import { getProducts } from "../../services/productService";
 import { getProductImage } from "../../utils/productImages";
+import { addToCart } from "../../services/cartService";
 
 const { Title, Paragraph } = Typography;
 
@@ -12,7 +13,6 @@ export default function Products() {
     const fetchProducts = async () => {
       try {
         const response = await getProducts();
-        // console.log(response);
         setProducts(response);
       } catch (error) {
         console.error("Error al obtener los productos:", error);
@@ -21,20 +21,43 @@ export default function Products() {
     fetchProducts();
   }, []);
 
+  const handleAddToCart = (product) => {
+    addToCart(product);
+    message.success(`${product.name} agregado al carrito`);
+  };
+
   return (
-    <Row gutter={[16, 16]}>
+    <Row gutter={[16, 16]} style={{ marginTop: 16 }}>
       {products.map((product) => (
-        <Card title={product.name} key={product.id}>
-          <Image
-            src={getProductImage(product)}
-            alt={product.name}
-            style={{ width: "100%", height: 200, objectFit: "contain" }}
-          />
-          <Title level={3}>{product.name}</Title>
-          <Paragraph>${product.price}</Paragraph>
-          <Paragraph>{product.description}</Paragraph>
-          <Button type="primary">Add to Cart</Button>
-        </Card>
+        <Col xs={24} sm={12} md={8} key={product.product_id}>
+          <Card
+            hoverable
+            style={{ height: "100%" }}
+            cover={
+              <Image
+                src={getProductImage(product)}
+                alt={product.name}
+                preview={false}
+                style={{
+                  width: "100%",
+                  height: 200,
+                  objectFit: "contain",
+                  padding: 16,
+                }}
+              />
+            }
+          >
+            <Title level={4}>{product.name}</Title>
+            <Paragraph>${product.price}</Paragraph>
+            <Paragraph ellipsis={{ rows: 2 }}>
+              {product.description}
+            </Paragraph>
+
+            <Button type="primary" onClick={() => handleAddToCart(product)}>
+              Add to Cart
+            </Button>
+          </Card>
+        </Col>
       ))}
     </Row>
   );
