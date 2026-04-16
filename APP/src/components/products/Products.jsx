@@ -37,7 +37,6 @@ export default function Products() {
               <Image
                 src={getProductImage(product)}
                 alt={product.name}
-                preview={false}
                 style={{
                   width: "100%",
                   height: 200,
@@ -49,9 +48,7 @@ export default function Products() {
           >
             <Title level={4}>{product.name}</Title>
             <Paragraph>${product.price}</Paragraph>
-            <Paragraph ellipsis={{ rows: 2 }}>
-              {product.description}
-            </Paragraph>
+            <Paragraph ellipsis={{ rows: 2 }}>{product.description}</Paragraph>
 
             <Button type="primary" onClick={() => handleAddToCart(product)}>
               Add to Cart
