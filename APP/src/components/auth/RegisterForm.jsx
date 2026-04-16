@@ -1,10 +1,14 @@
 import { Button, Form, Input, message } from "antd";
 import { registerUser } from "../../services/authService";
+import { useNavigate } from "react-router-dom";
 
 export default function RegisterForm({ onRegisterSuccess }) {
   const [form] = Form.useForm();
+  const navigate = useNavigate();
 
+  //Aqui creo la logica de la creacion del usuario
   const onFinish = async (values) => {
+    //Aqui llamo al servicio de authService
     try {
       await registerUser({
         name: values.name,
@@ -12,12 +16,16 @@ export default function RegisterForm({ onRegisterSuccess }) {
         password: values.password,
       });
 
+      //Aqui mensaje de exito
+
       message.success("Usuario registrado correctamente");
       form.resetFields();
 
       if (onRegisterSuccess) {
         onRegisterSuccess();
       }
+      //Sí es exitoso el registro, lo envio al Home
+      navigate("/home");
     } catch (error) {
       message.error(
         error.response.data.message || "No se pudo registrar el usuario",

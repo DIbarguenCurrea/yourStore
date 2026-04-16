@@ -10,8 +10,8 @@ const createUser = async (userData) => {
   return result;
 };
 
-const userbyId = async (id) => {
-  const sql = `SELECT id, name, email, password_hash FROM users WHERE id = ? limit 1`;
+const userById = async (id) => {
+  const sql = `SELECT id, name, email FROM users WHERE id = ? LIMIT 1`;
   const [rows] = await db.execute(sql, [id]);
   return rows[0];
 };
@@ -23,9 +23,33 @@ const userByEmail = async (email) => {
 };
 
 const updateUser = async (id, userData) => {
-  const { name, password_hash } = userData;
-  const sql = `UPDATE users SET name = ?, password_hash = ? WHERE id = ?`;
-  const [result] = await db.execute(sql, [name, password_hash, id]);
+  //Aqui hacemos que si el usuario solo quiere cambiar el nombre, actualice el nombre y la contraseña no nos quede vacia o undefined y nos la suscriba y genere problemas al iniciar la sesion despues.
+  const fields = [];
+  const values = [];
+
+  if (userData.name) {
+    fields.push("name = ?");
+    values.push(userData.name);
+  }
+
+  if (userData.password_hash) {
+    fields.push("password_hash = ?");
+    values.push(userData.password_hash);
+  }
+
+  if (fields.length === 0) {
+    throw new Error("No hay datos para actualizar");
+  }
+
+  values.push(id);
+
+  const sql = `
+    UPDATE users
+    SET ${fields.join(", ")}
+    WHERE id = ?
+  `;
+
+  const [result] = await db.execute(sql, values);
   return result;
 };
 
@@ -35,4 +59,4 @@ const deleteUser = async (id) => {
   return result;
 };
 
-module.exports = { createUser, userbyId, userByEmail, updateUser, deleteUser };
+module.exports = { createUser, userById, userByEmail, updateUser, deleteUser };

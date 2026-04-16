@@ -50,3 +50,42 @@ export const getUser = () => {
   const user = localStorage.getItem("user");
   return user ? JSON.parse(user) : null;
 };
+
+// getProfile, aquí se obtiene el perfil del usuario
+export const getProfile = async () => {
+  //Tomamos el token del localstorage
+  const token = localStorage.getItem("token");
+  //Hago la peticion al endpoint y pasamos en el header el token, Sin token no hay acceso a la ruta.
+  const response = await axios.get(`${API_URL}/users/profile`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  return response.data;
+};
+
+export const updateUser = async (values) => {
+  //sin token no se hace nada
+  const token = localStorage.getItem("token");
+  // Objeto para enviar los datos al backend
+  const payload = {};
+
+  //Si el nombre no es vacío, se agrega al payload
+  if (values.name && values.name.trim() !== "") {
+    payload.name = values.name.trim();
+  }
+
+  //Si la contraseña no es vacía, se agrega al payload
+  if (values.password && values.password.trim() !== "") {
+    payload.password = values.password.trim();
+  }
+  //Peticion al backend y con token para autorizar
+  const response = await axios.put(`${API_URL}/users/profile`, payload, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  //Return con los datos del usuario actualizados
+  return response.data;
+};

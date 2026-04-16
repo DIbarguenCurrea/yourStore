@@ -34,26 +34,33 @@ const registerUser = async (req, res) => {
 
 const updateUser = async (req, res) => {
   try {
-    const { id } = req.params;
     const { name, password } = req.body;
 
-    const updateData = {
-      name,
-    };
+    const updateData = {};
 
-    if (password && password.trim() !== "") {
-      updateData.password_hash = password
-        ? await bcrypt.hash(password, 10)
-        : undefined;
+    if (name && name.trim() !== "") {
+      updateData.name = name.trim();
     }
 
-    await userModel.updateUser(id, updateData);
+    if (password && password.trim() !== "") {
+      updateData.password_hash = await bcrypt.hash(password, 10);
+    }
 
-    return res
-      .status(200)
-      .json({ message: "Usuario actualizado correctamete" });
+    if (Object.keys(updateData).length === 0) {
+      return res.status(400).json({ message: "No hay datos para actualizar" });
+    }
+
+    await userModel.updateUser(req.user.id, updateData);
+
+    const updatedUser = await userModel.userById(req.user.id);
+
+    return res.status(200).json({
+      message: "Perfil actualizado correctamente",
+      user: updatedUser,
+    });
   } catch (error) {
-    console.error("Error al actualizar el usuario:", error);
+    console.error("Error al actualizar el perfil:", error);
+    return res.status(500).json({ message: "Error interno del servidor" });
   }
 };
 
@@ -88,9 +95,16 @@ const loginUser = async (req, res) => {
 
 const getProfile = async (req, res) => {
   try {
+    //Aqui ya uso el modal del userById para obtener el usuario y no el user que viene del token.
+    const user = await userModel.userById(req.user.id);
+
+    if (!user) {
+      return res.status(404).json({ message: "Usuario no encontrado" });
+    }
+
     return res.status(200).json({
       message: "Perfil obtenido correctamente",
-      user: req.user,
+      user,
     });
   } catch (error) {
     console.error("Error al obtener el perfil:", error);

@@ -4,14 +4,17 @@ import { useNavigate } from "react-router-dom";
 
 export default function LoginForm() {
   const navigate = useNavigate();
-
+  //Logica de iniiciar sesión
   const onFinish = async (values) => {
+    //Aqui llamo al servicio desde authService
     try {
       await loginUser({
         email: values.email,
         password: values.password,
       });
+      //Mensaje de exito
       message.success("Inicio de sesión exitoso");
+      //Y es enviado al homePage
       navigate("/home");
     } catch (error) {
       message.error(error.response.data.message || "No se pudo iniciar sesión");
